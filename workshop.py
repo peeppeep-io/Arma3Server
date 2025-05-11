@@ -11,15 +11,19 @@ USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 
 
 def download(mods):
     for id in mods:
-        steamcmd = ["/steamcmd/steamcmd.sh"]
-        steamcmd.extend(["+force_install_dir", "/arma3"])
-        steamcmd.extend(["+login", os.environ["STEAM_USER"], os.environ["STEAM_PASSWORD"]])
-        steamcmd.extend(["+workshop_download_item", "107410", id])
-        steamcmd.extend(["+quit"])
+        steamcmd = [
+            "/steamcmd/steamcmd.sh",
+            "+force_install_dir", "/arma3",
+            "+login", os.environ["STEAM_USER"], os.environ["STEAM_PASSWORD"],
+            "+workshop_download_item", "107410", id,
+            "+quit"
+        ]
         while(True):
             with open('steam_cmd_logs.txt', 'w') as out_file, open('steam_cmd_logs_err.txt', 'w') as err_file:
                 subprocess.call(steamcmd,stdout=out_file, stderr=err_file)
-            lines = out_file.readlines()
+            with open('steam_cmd_logs.txt', 'r') as out_file:
+                lines = out_file.readlines()
+            is_match = False
             pattern = r'Success\. Downloaded item (\d+)'
             for line in reversed(lines):
                 match = re.search(pattern, line)
